@@ -32,10 +32,13 @@ def genInvoiceClass(user_Info, pdf_File,SH_flag):
     extracted_password = ""
     extracted_regexlist = ""
     driver = None
-
     extracted_pay_order = ""
     extracted_date_range = ""
     extracted_total_by_line = []
+    # Lista de números a los que se enviarán los archivos
+    # Configuración
+    phone_numbers = ["+50661695369"]  # Números de destino
+    destination_folder = r"C:\Users\Administrator\OneDrive - Universidad Fidélitas\Documentos\CMHN_output_online"
     
     #Inicializar configuraciones de chrome
     
@@ -78,7 +81,7 @@ def genInvoiceClass(user_Info, pdf_File,SH_flag):
                         f"Pay order: {extracted_pay_order}\n"
                         f"Date Range: {extracted_date_range}\n"
                         f"Extracted totals: {formatted_totals}\n")
-            gen.mhn_automatization(extracted_tiv,extracted_mail,extracted_legal_id,extracted_user,extracted_password,extracted_pay_order,extracted_date_range,extracted_total_by_line,driver,SH_flag,output_folder)  
+            gen.mhn_automatization(extracted_tiv,extracted_mail,extracted_legal_id,extracted_user,extracted_password,extracted_pay_order,extracted_date_range,extracted_total_by_line,driver,SH_flag,output_folder,destination_folder,phone_numbers)  
         else:
             user_response= messagebox.askyesno("Please confirm",
             f"The following data were extracted:\n\n"
@@ -88,7 +91,7 @@ def genInvoiceClass(user_Info, pdf_File,SH_flag):
             f"Do you confirm this data?")
     
             if user_response:
-                gen.mhn_automatization(extracted_tiv,extracted_mail,extracted_legal_id,extracted_user,extracted_password,extracted_pay_order,extracted_date_range,extracted_total_by_line,driver,SH_flag,output_folder)
+                gen.mhn_automatization(extracted_tiv,extracted_mail,extracted_legal_id,extracted_user,extracted_password,extracted_pay_order,extracted_date_range,extracted_total_by_line,driver,SH_flag,output_folder,destination_folder,phone_numbers)
             else:
                 messagebox.showinfo("Information", "User clicked No.\nExiting...")
     finally:
@@ -96,7 +99,7 @@ def genInvoiceClass(user_Info, pdf_File,SH_flag):
         if 'driver' in locals():
             driver.quit()          
 
-def mhn_automatization(tiv,mail,legal_id,user,password,pay_order,date_range,total_by_line,driver,SH_flag,output_folder):
+def mhn_automatization(tiv,mail,legal_id,user,password,pay_order,date_range,total_by_line,driver,SH_flag,output_folder,destination_folder,phone_numbers):
     wait = WebDriverWait(driver, 10)
     i = None  # Inicializa una variable para contar las iteraciones
     success = False  # Inicializa una variable para indicar el éxito de la operación
@@ -387,16 +390,13 @@ def mhn_automatization(tiv,mail,legal_id,user,password,pay_order,date_range,tota
     driver.execute_script("arguments[0].click();", closeSesion_button)
     if SH_flag:
         logger.info("************** End of automatization, the process has been successfully completed **************")
+        ## Enviar los resultados del folder MHN_output
+        whatsapp_sender(phone_numbers, output_folder, destination_folder)
     else:
         messagebox.showinfo("End of automatization", "The process has been successfully completed")
         logger.info("************** End of automatization, the process has been successfully completed **************")
-        
-    ## Enviar los resultados del folder MHN_output
-    # Lista de números a los que se enviarán los archivos
-    # phone_numbers = ["+50661695369", "+50662946501", "+50662570596"]
-    # whatsapp_sender = WhatsAppSender(phone_numbers, output_folder)
-    # whatsapp_sender.send_files()
-
+        ## Enviar los resultados del folder MHN_output
+        whatsapp_sender(phone_numbers, output_folder, destination_folder)
 def process_pdf(file_path):
     
     # Procesa un PDF y utiliza las funciones de búsqueda para extraer la información necesaria.

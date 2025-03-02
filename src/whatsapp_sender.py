@@ -7,15 +7,15 @@ import time
 
 def whatsapp_sender(phone_numbers, source_folder, destination_folder):
     """
-    Envía un mensaje de WhatsApp notificando que los archivos fueron generados
-    y copia los archivos a otra carpeta.
+    Sends a WhatsApp message notifying that the files were generated.
+    and copies the files to another folder.
     """
     try:
         # Obtener lista de archivos en la carpeta de salida
         files = [f for f in os.listdir(source_folder) if os.path.isfile(os.path.join(source_folder, f))]
         
         if not files:
-            print("No hay archivos para notificar.")
+            print("No files to notify.")
             return
         
         # Enviar mensaje por WhatsApp a cada número
